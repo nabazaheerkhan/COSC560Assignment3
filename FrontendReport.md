@@ -1,270 +1,93 @@
 # Frontend Development Report - ReactJS with TypeScript
 
 
-Repository Link:
+Repository Link: https://github.com/nabazaheerkhan/COSC560Assignment3
 
 
-## Overview
-This report documents the implementation of the React frontend for the Blog application, built with TypeScript and integrated with the Laravel backend API. The frontend provides a modern, responsive user interface for managing blog posts with full CRUD operations.
+**Overview**
+This report goes through the implementation of the React frontend for a Blog application. The frontend was built with TypeScript and connected to a Laravel backend API. The main goal was to create a modern, responsive interface that lets users manage blog posts with full CRUD functionality (create, read, update, delete).
 
-## Technology Stack
+# 1. Project Structure
 
-### Core Technologies
-- **React 18** with TypeScript
-- **React Router v6** for navigation
-- **React Bootstrap** for UI components
-- **Axios** for API communication
-- **Context API** for state management
+The project followed a clear directory structure so everything stayed organised:
 
-### Development Tools
-- **Create React App** with TypeScript template
-- **ESLint** for code quality
-- **TypeScript** for type safety
-- **CSS3** with custom styling
-
-## Implementation Details
-
-### 1. Project Structure
-
-#### Directory Organisation
-```
 frontend/src/
-├── components/          # React components
-├── contexts/           # Context providers
-├── services/           # API services
-├── types/              # TypeScript interfaces
-├── App.tsx            # Main application component
-└── index.tsx          # Application entry point
-```
+├── components/       # React components
+├── contexts/         # Context providers
+├── services/         # API services
+├── types/            # TypeScript interfaces
+├── App.tsx           # Main app
+└── index.tsx         # Entry point
 
-### 2. TypeScript Implementation
+# 2. TypeScript Usage
 
-#### Type Definitions
-```typescript
-// Core data interfaces
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  is_admin: boolean;
-  created_at: string;
-  updated_at: string;
-}
+I created interfaces for core entities like User, Post, and Category. This helped a lot in keeping the code predictable and safe when working with API responses. For example:
 
-interface Post {
-  id: number;
-  title: string;
-  content: string | null;
-  user_id: number;
-  category_id: number;
-  is_active: 'Yes' | 'No';
-  created_at: string;
-  updated_at: string;
-  user: User;
-  category: Category;
-}
-
-interface Category {
-  id: number;
-  name: string;
-  created_at: string;
-  updated_at: string;
-}
-```
-
-#### API Response Types
-```typescript
-interface AuthResponse {
-  message: string;
-  user: User;
-  token: string;
-}
-
-interface PostsResponse {
-  posts: Post[];
-}
-
-interface PostResponse {
-  post: Post;
-}
-```
-
-### 3. Component Implementation
-
-#### Core Components
-
-##### App Component
-- **Routing setup** with React Router
-- **Authentication context** provider
-- **Protected routes** implementation
-- **Public routes** for unauthenticated users
-
-##### Navigation Component
-- **Responsive navbar** with Bootstrap
-- **Dynamic menu items** based on authentication status
-- **User information display**
-- **Logout functionality**
-
-##### Posts List Component
-- **Grid layout** for blog posts
-- **Card-based design** for each post
-- **Action buttons** (View, Edit, Delete)
-- **Permission-based actions** (users can only edit their own posts)
-- **Local state management** for delete operations
-
-##### Post Detail Component
-- **Full post display** with metadata
-- **User and category information**
-- **Action buttons** for post owners
-- **Responsive design** for mobile devices
-
-##### Post Create Component
-- **Form validation** with TypeScript
-- **Category selection** dropdown
-- **Status selection** (Active/Inactive)
-- **Error handling** and user feedback
-
-##### Post Edit Component
-- **Pre-loaded form data** from API
-- **Same validation** as create form
-- **Category and status updates**
-- **Permission checking** before editing
-
-##### Authentication Components
-- **Login form** with email/password
-- **Registration form** with validation
-- **Error handling** for authentication failures
-- **Form validation** with user feedback
-
-### 4. State Management
-
-#### Authentication Context
-```typescript
-interface AuthContextType {
-  user: User | null;
-  token: string | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, password_confirmation: string) => Promise<void>;
-  logout: () => Promise<void>;
-  isLoading: boolean;
-}
-```
-
-#### Context Features
-- **User authentication state**
-- **Token management**
-- **Login/logout functionality**
-- **User registration**
-- **Loading states**
+	interface Post {
+  	id: number;
+  	title: string;
+  	content: string | null;
+  	user_id: number;
+  	category_id: number;
+  	is_active: 'Yes' | 'No';
+  	created_at: string;
+  	updated_at: string;
+  	user: User;
+  	category: Category;
+	}
 
 
-### 5. API Integration
+This kind of setup meant I didn’t have to second-guess what a Post object looked like when passing it around.
 
-#### Service Layer
-```typescript
-// API configuration
-const API_BASE_URL = 'http://localhost:8000/api';
-const api = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-    'Accept': 'application/json',
-  },
-});
-```
+# 3. Components
 
-#### Authentication Interceptor
-- **Automatic token injection** in request headers
-- **Bearer token format** for Sanctum
-- **Error handling** for authentication failures
+I split the frontend into reusable components:
 
-#### API Services
-- **AuthAPI**: Login, register, logout, user profile
-- **PostsAPI**: CRUD operations for blog posts
-- **CategoriesAPI**: Category listing for forms
+App Component: handled routing and authentication context.
 
-### 6. Routing Implementation
+Navigation: a responsive navbar that changed depending on whether a user was logged in.
 
-#### Route Structure
-```typescript
-// Public routes
-<Route path="/" element={<PostsList />} />
-<Route path="/post/:id" element={<PostDetail />} />
+Posts List: displayed posts in a grid with cards, along with actions like view, edit, delete.
 
-// Authentication routes
-<Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-<Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+Post Detail: full post view with metadata and owner actions.
 
-// Protected routes
-<Route path="/post/create" element={<ProtectedRoute><PostCreate /></ProtectedRoute>} />
-<Route path="/post/edit/:id" element={<ProtectedRoute><PostEdit /></ProtectedRoute>} />
-```
+Post Create/Edit: forms with validation, category dropdowns, and status options.
 
-#### Route Protection
-- **ProtectedRoute component** for authenticated users
-- **PublicRoute component** for unauthenticated users
-- **Automatic redirects** based on authentication status
-- **Loading states** during authentication checks
-
-### 7. UI/UX Design
-
-#### Bootstrap Integration
-- **React Bootstrap components** for consistent design
-- **Responsive grid system** for mobile compatibility
-- **Form components** with validation states
-- **Button variants** for different actions
-- **Alert components** for user feedback
-
-#### Custom Styling
-```css
-.card {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  transition: box-shadow 0.3s ease;
-}
-
-.card:hover {
-  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-.btn {
-  border-radius: 6px;
-}
-```
-
-#### Responsive Design
-- **Mobile-first approach** with Bootstrap grid
-- **Flexible layouts** for different screen sizes
-- **Touch-friendly** button sizes
-- **Readable typography** across devices
-
-### 8. Form Handling
-
-#### Form Validation
-- **Client-side validation** with TypeScript
-- **Required field checking**
-- **Password confirmation** validation
-- **Character limits** enforcement
-- **Real-time feedback** for users
-
-#### Form State Management
-- **Controlled components** for form inputs
-- **Dynamic form updates** based on user input
-- **Error state management**
-- **Loading states** during submission
+Auth Components: login and register forms with error handling.
 
 
-## Challenges and Solutions
+I used a custom Auth Context to manage user state, tokens, and authentication actions. This made it easier to share login/logout across components without prop-drilling.
 
-One challenge I had was the Typescript Integration. There was a bit of an issue with the complex type definitions for API responses. However, this was a quick fix because I was eventually able to create somewhat comprehensive interfaces and used type inference. The other issue that I slighlty face was the consistent validation across create/edit forms. I was able to quickly resolve this by sharing the validation logic and TypeScript interfaces
+# 5. API Integration
 
-## Conclusion
+I set up an Axios instance with a base URL (http://localhost:8000/api). It included an interceptor that automatically added the token to headers if available. I built three service layers:
 
-Our React frontend has been successfully implemented with TypeScript, providing a modern, responsive user interface for the Blog application. The implementation includes:
+1. AuthAPI (login, register, logout, profile)
+1. PostsAPI (CRUD for posts)
+1. CategoriesAPI (fetch categories for forms)
 
-- Full CRUD operations or blog posts
-- Secure authentication with token-based access
-- Responsive design for all device types
+
+# 6. Forms
+
+Forms were built as controlled components with client-side validation in TypeScript. They included required field checks, password confirmation, and character limits. Real-time feedback helped improve the user experience.
+
+# Challenges 
+One of the main challenges was getting the TypeScript interfaces for the API responses right. At first, the nested objects (like posts including users and categories) felt messy, but after defining proper interfaces, it became a lot smoother.
+
+Another smaller issue was keeping the validation consistent between the create and edit post forms. I solved this by sharing the same validation logic and types between both components.
+
+# Conclusion
+
+Overall, the React frontend was successfully built with TypeScript and integrated with Laravel. Key achievements included:
+
+- Full CRUD operations for blog posts
+- Token-based authentication
+- Responsive design for mobile and desktop
 - Type-safe development with TypeScript
+- Context API for clean state management
+- Bootstrap styling with custom tweaks
+
+The final result is a modern, user-friendly frontend that works seamlessly with the backend API. It’s ready for production and can easily be extended with new features.
 - Modern React patterns with hooks and context
 - Professional UI with React Bootstrap
 - Comprehensive error handling and user feedback
